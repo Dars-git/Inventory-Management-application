@@ -2,7 +2,7 @@
 {% block title %}Order{% endblock %}
 {% block body %}
 <br />
-<h4 align="center">Enter Item Details</h4>
+<h4 align="center">Enter Order Details</h4>
 <br />
 <form method="post" id="insert_form">
  <div class="table-repsonsive">
@@ -31,14 +31,22 @@
   <br><br>
   <div class="col-md-6 ">
   <div class="form-group">
-      <label for="gross_amount" class="col-sm-5 control-label">Gross Amount</label>
-      <div class="col-sm-7 ">
-        <input type="text" class="form-control" id="total_amount" name="total_amount" readonly />
-
-      </div>
+      <label for="client_name" class="control-label">Client Name</label>
+      <input type="text" class="form-control" id="client_name" name="client_name" required />
     </div>
-
+    <div class="form-group">
+      <label for="client_contact" class="control-label">Client Contact Info</label>
+      <input type="text" class="form-control" id="client_contact" name="client_contact" required />
     </div>
+    <div class="form-group">
+      <label for="order_date" class="control-label">Order Date</label>
+      <input type="date" class="form-control" id="order_date" name="order_date" required />
+    </div>
+    <div class="form-group">
+      <label for="gross_amount" class="control-label">Gross Amount</label>
+      <input type="text" class="form-control" id="total_amount" name="total_amount" readonly />
+    </div>
+  </div>
 
 <br><br><br>
   <br>
@@ -47,5 +55,7 @@
   </div>
  </div>
 </form>
+
+
 
 {% endblock %}

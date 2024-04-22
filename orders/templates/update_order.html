@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block title %}Order{% endblock %}
 {% block body %}
-<h3 align="center">Add Remove Select Box Fields Dynamically using jQuery Ajax in PHP</h3>
+<h3 align="center"> Update Order</h3>
 <br />
 <h4 align="center">Enter Item Details</h4>
 <br />
@@ -18,25 +18,38 @@
     <th><button type="button" name="add" class="btn btn-success btn-sm add" onclick="addrow()"><i class="fas fa-plus"></i></button></th>
    </tr>
    <tbody>
-     {% for order in order %}
-     <tr>
-     <td><input type="text" name="item_bar[]" class="form-control item_bar" id="item_{{loop.index}}" onkeydown="getProduct(event,{{loop.index}});" value="{{order.barcode}}"/></td>
-     <td><input type="text" name="item_quantity[]" class="form-control item_quantity" id="qty_{{loop.index}}" onkeyup="getTotal({{loop.index}})"value="{{order.quantity}}"/></td>
-     <td><input type="text" name="item_name[]" class="form-control item_name" id="name_{{loop.index}}" readonly value="{{order.name}}"/></td>
-     <td><input type="text" name="price[]" class="form-control item_price" id="price_{{loop.index}}" readonly value="{{order.price}}"/></td>
-     <td><input type="text" name="total[]" class="form-control item_total" id="total_{{loop.index}}"  readonly value="{{order.total}}"/></td>
+
+          <tr>
+     <td><input type="text" name="product_code" class="form-control item_bar" id="item_1" onkeydown="getProduct(order.product_code);" value="{{order.product_code}}"/></td>
+     <td><input type="text" name="item_quantity" class="form-control item_quantity" id="qty_1" onkeyup="getTotal(1)" value="{{order.quantity}}"/></td>
+     <td><input type="text" name="product_type" class="form-control item_name" id="name_1" readonly value="{{order.product_type}}"/></td>
+     <td><input type="text" name="price" class="form-control item_price" id="price_1" readonly value="{{order.price}}"/></td>
+     <td><input type="text" name="total" class="form-control item_total" id="total_1"  readonly value="{{order.total}}" /></td>
      <td><button type="button" name="remove" class="btn btn-danger btn-sm remove" ><i class="fas fa-minus"></i></button></td>
    </tr>
-   {% endfor %}
+
    </tbody>
 
   </table>
   <br><br>
   <div class="col-md-6 ">
+        <div class="form-group">
+      <label for="client_name" class="control-label">Client Name</label>
+      <input type="text" class="form-control" id="client_name" name="client_name" required  value="{{order.client_name}}"/>
+    </div>
+    <div class="form-group">
+      <label for="client_contact" class="control-label">Client Contact Info</label>
+      <input type="text" class="form-control" id="client_contact" name="client_contact" required value="{{order.client_contact}}"/>
+    </div>
+    <div class="form-group">
+      <label for="order_date" class="control-label">Order Date</label>
+      <input type="date" class="form-control" id="order_date" name="order_date" required value="{{order.order_date}}"/>
+    </div>
+
   <div class="form-group">
       <label for="gross_amount" class="col-sm-5 control-label">Gross Amount</label>
       <div class="col-sm-7 ">
-        <input type="text" class="form-control" id="total_amount" name="total_amount" readonly value="{{order_amount.total_amount}}"/>
+        <input type="text" class="form-control" id="total_amount" name="total_amount" id="gross_amount" readonly value="{{order.total}}"/>
 
       </div>
     </div>

@@ -7,6 +7,8 @@ from sqlalchemy import func
 from orders.forms import RegisterForm
 from flask_login import login_user, current_user, logout_user, login_required
 from passlib.hash import sha256_crypt
+from datetime import datetime
+
 
 def getlist():
     user = Users.query.filter_by(email=current_user.email).first()
@@ -15,7 +17,7 @@ def getlist():
 
 
 @app.route('/dashboard')
-@login_required
+#@login_required
 def dashboard():
     order = db.session.query(Orders).filter(func.date(Orders.date_creation) == date.today()).all()
     count = 0
@@ -60,7 +62,7 @@ def login():
     return render_template('login.html')
 
 @app.route('/logout')
-@login_required
+#@login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
@@ -83,80 +85,99 @@ def register():
     return render_template('register.html', form=form)
 
 @app.route('/roles')
-@login_required
+#@login_required
 def roles():
     users = Users.query.all()
     return render_template('roles.html',users=users)
 
 @app.route('/order')
-@login_required
+#@login_required
 def order():
     return render_template('makeorder.html')
 
-
-@app.route('/insert',methods = ['POST'])
-@login_required
+@app.route('/insert', methods=['POST'])
+# @login_required
 def insert():
+    client_name = request.form.get('client_name')
+    client_contact = request.form.get('client_contact')
+    order_date = request.form.get('order_date')
+    total_amount = request.form.get('total_amount')
+
     barcode = request.form.getlist('item_bar[]')
     qua = request.form.getlist('item_quantity[]')
     name = request.form.getlist('item_name[]')
     total = request.form.getlist('total[]')
     price = request.form.getlist('price[]')
-    total_amount = request.form.get('total_amount')
+
+    # Convert order_date string to datetime object
+    order_date = datetime.strptime(order_date, '%Y-%m-%d')
 
 
-    db.session.commit()
 
-    add = Orders(total_amount=total_amount,user_order=current_user)
-    db.session.add(add)
-    db.session.commit()
-    for q,p,t,n,b in zip(qua,price,total,name,barcode):
-            ord = Orders_items(barcode=b,quantity=q,name=n,price=p,total=t,Orders_items=add)
+    # Insert order items into database
+    try:
+        # Insert order items into database
+        for q, p, t, n, b in zip(qua, price, total, name, barcode):
+            ord = Orders_items(product_code=b, quantity=q, product_type=n, price=p, total=t,
+                               client_name=client_name, client_contact=client_contact, order_date=order_date)
             db.session.add(ord)
-    db.session.commit()
-    return jsonify({'data':'ok'})
+        db.session.commit()
+        print("1")  # Print "1" if insertion is successful
+        orders = Orders.query.all()
+        print(orders)
+
+    except Exception as e:
+        print(e)
+
+    return jsonify({'data': 'ok'})
+
 
 @app.route('/data',methods=['POST'])
-@login_required
+#@login_required
 def getdata():
     input_item = request.json
-    pro = Products.query.filter_by(barcode=input_item).first()
-    return jsonify({'price':pro.price ,'name':pro.name,'quantity':pro.quantity})
+    pro = Products.query.filter_by(product_code=input_item).first()
+    return jsonify({'price':pro.price ,'product_type':pro.product_type,'quantity_range':pro.quantity_range, 'quantity_min':pro.quantity_min, 'quantity_max':pro.quantity_max})
 
 @app.route('/products',methods=['GET','POST'])
-@login_required
+#@login_required
 def products():
         products = Products.query.all()
         if request.method == 'POST':
-            name = request.form.get('name')
-            barcode = request.form.get('barcode')
-            quantity_from = request.form.get('quantity_from')
-            quantity_to = request.form.get('quantity_to')
+            product_type = request.form.get('product_type')
+            client_role = request.form.get('client_role')
+            description = request.form.get('description')
+            product_code = request.form.get('product_code')
+            quantity_range = request.form.get('quantity_range')
+            if "-" in quantity_range:
+                quantity_min, quantity_max = map(int, quantity_range.split('-'))
             price = request.form.get('price')
-            add = Products(name=name,barcode=barcode,quantity_from=quantity_from,quantity_to=quantity_to,price=price)
+            add = Products(product_type=product_type,client_role=client_role,description=description,product_code=product_code, quantity_range=quantity_range, quantity_min=quantity_min, quantity_max=quantity_max, price=price )
             db.session.add(add)
             db.session.commit()
             return redirect(url_for('products'))
         return render_template('product.html',products=products)
 
 
-@app.route("/product/delete/<int:product_id>", methods=['POST'])
-@login_required
-def delete_product(product_id):
-    product = Products.query.get(product_id)
+@app.route("/product/delete/<int:product_code>", methods=['POST'])
+#@login_required
+def delete_product(product_code):
+    product = Products.query.get(product_code)
     db.session.delete(product)
     db.session.commit()
     return redirect(url_for('products'))
 
 
-@app.route("/product/update/<int:product_id>", methods=['POST','GET'])
-@login_required
-def update_product(product_id):
-    product = Products.query.get(product_id)
+@app.route("/product/update/<int:product_code>", methods=['POST','GET'])
+#@login_required
+def update_product(product_code):
+    product = Products.query.get(product_code)
     if request.method == 'POST':
-        product.name = request.form.get('name')
-        product.barcode = request.form.get('barcode')
-        product.quantity = request.form.get('quantity')
+        product.product_type = request.form.get('product_type')
+        product.client_role = request.form.get('client_role')
+        product.description = request.form.get('description')
+        product.product_code = request.form.get('product_code')
+        product.quantity = request.form.get('quantity_range')
         product.price = request.form.get('price')
         db.session.commit()
         return redirect(url_for('products'))
@@ -164,68 +185,70 @@ def update_product(product_id):
     return render_template('update_product.html',product=product)
 
 @app.route("/manageorder")
-@login_required
+#@login_required
 def manageorder():
-    orders = Orders.query.all()
+    orders = Orders_items.query.all()
+    print(orders)
     return render_template('manageorder.html',orders=orders)
 
 
 def deleteorder(order_id):
-    order = Orders.query.get(order_id)
-    for i in order.orders:
-        product = Products.query.filter_by(barcode=i.barcode).first()
-        product.quantity = product.quantity + int(i.quantity)
-    db.session.commit()
+    order = Orders_items.query.get(order_id)
     db.session.delete(order)
     db.session.commit()
 
 
 @app.route("/order/delete/<int:order_id>", methods=['POST'])
-@login_required
+#@login_required
 def delete_order(order_id):
     deleteorder(order_id)
     return redirect(url_for('manageorder'))
 
 @app.route("/order/update/<int:order_id>", methods=['POST','GET'])
-@login_required
+#@login_required
 def update_order(order_id):
-    order = Orders.query.get(order_id)
-    if request.method == 'POST':
-        barcode = request.form.getlist('item_bar[]')
-        qua = request.form.getlist('item_quantity[]')
-        name = request.form.getlist('item_name[]')
-        total = request.form.getlist('total[]')
-        price = request.form.getlist('price[]')
-        total_amount = request.form.get('total_amount')
-        deleteorder(order_id)
-        for n,q in zip(barcode,qua):
-            product = Products.query.filter_by(barcode=n).first()
-            if product.quantity > 0 :
-                product.quantity = product.quantity - int(q)
-            else :
-                print("you do not have this much of quantity",n)
-        db.session.commit()
 
-        add = Orders(total_amount=total_amount,user_order=current_user)
-        db.session.add(add)
-        db.session.commit()
-        for q,p,t,n,b in zip(qua,price,total,name,barcode):
-                ord = Orders_items(barcode=b,quantity=q,name=n,price=p,total=t,Orders_items=add)
-                db.session.add(ord)
+    order = Orders_items.query.get(order_id)
+
+    if request.method == 'POST':
+        product_code = request.form.get('product_code')
+        quantity = request.form.get('item_quantity')
+        product_type = request.form.get('product_type')
+        total = request.form.get('total')
+        price = request.form.get('price')
+        client_name = request.form.get('client_name')
+        client_contact = request.form.get('client_contact')
+        order_date = request.form.get('order_date')
+        total_amount = request.form.get('total_amount')
+        order_date = datetime.strptime(order_date, '%Y-%m-%d')
+        #deleteorder(order_id)
+
+        existing_order = Orders_items.query.filter_by(id=order_id).first()
+
+        if existing_order:
+            # Update the attributes of the existing item
+            existing_order.product_code = product_code
+            existing_order.quantity = quantity
+            existing_order.price = price
+            existing_order.total = total
+            existing_order.product_type = product_type
+            existing_order.client_name = client_name
+            existing_order.client_contact = client_contact
+            existing_order.order_date = order_date
         db.session.commit()
 
         return redirect(url_for('manageorder'))
 
-    return render_template('update_order.html',order = order.orders,order_amount=order)
+    return render_template('update_order.html',order = order,order_amount=order)
 
 @app.route("/printInvoice/<int:order_id>")
-@login_required
+#@login_required
 def printInvoice(order_id):
-      order = Orders.query.get(order_id)
-      renderd = render_template('print.html',order=order)
-      css = ['orders/static/css/sb-admin-2.min.css']
-      pdf = pdfkit.from_string(renderd,False,css=css)
-      response = make_response(pdf)
-      response.headers['Content-Type'] = 'application/pdf'
-      response.headers['Content-Disposition'] = f'attachment; filename = {order_id}.pdf'
-      return response
+      order = Orders_items.query.get(order_id)
+      #renderd = render_template('print.html',order=order)
+      #css = ['orders/static/css/sb-admin-2.min.css']
+      #pdf = pdfkit.from_string(renderd,False,css=css)
+      #response = make_response(pdf)
+      #response.headers['Content-Type'] = 'application/pdf'
+      #response.headers['Content-Disposition'] = f'attachment; filename = {order_id}.pdf'
+      return render_template('print.html',order=order)

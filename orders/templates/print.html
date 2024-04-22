@@ -1,37 +1,79 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-  </head>
-  <body>
-    <h1>Invoice</h1>
-    <h6>invoice No. {{order.id}}</h6>
-    <h6>Date : {{order.date_creation}}</h6>
-    <table  class="table table-striped">
-      <thead>
+<head>
+  <meta charset="utf-8">
+  <title>Invoice for Commonvision UMBC Design & Print Center</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Font Awesome CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Custom CSS -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    .invoice-heading {
+      margin-bottom: 30px;
+    }
+    .invoice-heading h1 {
+      color: #007bff;
+    }
+    .invoice-heading h6 {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .invoice-table th, .invoice-table td {
+      vertical-align: middle;
+    }
+    .total-amount {
+      margin-top: 30px;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #28a745;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="invoice-heading">
+          <h1 class="text-center">Invoice for Commonvision UMBC Design & Print Center</h1>
+          <h6><strong>Client:</strong> {{order.client_name}}</h6>
+          <h6><strong>Contact:</strong> {{order.client_contact}}</h6>
+          <h6>Invoice No. {{order.id}}</h6>
+          <h6>Date: {{order.order_date}}</h6>
+        </div>
+        <table class="table table-striped invoice-table">
+          <thead>
+            <tr>
+              <th scope="col">Product Code</th>
+              <th scope="col">Product Type</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Price</th>
+              <th scope="col">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{order.product_code}}</td>
+              <td>{{order.product_type}}</td>
+              <td>{{order.quantity}}</td>
+              <td>{{order.price}}</td>
+              <td>{{order.total}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="total-amount text-center">Total Amount: {{order.total}}</div>
+      </div>
+    </div>
+  </div>
 
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Quantity</th>
-          <th scope="col">Price</th>
-          <th scope="col">Total</th>
-        </tr>
-
-      </thead>
-      <tbody>
-        {% for i in order.orders %}
-        <tr>
-      <td>{{i.name}}</td>
-          <td>{{i.quantity}}</td>
-          <td>{{i.price}}</td>
-          <td>{{i.total}}</td>
-      </tr>
-        {% endfor %}
-       </tbody>
-    </table>
-    <h1>Total Amount :</h1>
-
-<button type="button" class="btn btn-success" name="button">{{order.total_amount}}</button>
-
-
-  </body>
+  <!-- jQuery and Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>

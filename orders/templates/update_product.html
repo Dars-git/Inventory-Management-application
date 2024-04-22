@@ -3,30 +3,39 @@
 {% block body %}
 
 <form  action=" " method="POST">
-<div class="form-group">
-       <label for="exampleInput">Name of product</label>
-       <input type="text" class="form-control" name="name" id="exampleInput" value={{product.name}}>
-   </div>
+        <div class="form-group">
+             <label for="product_type">Product Type</label>
+             <input type="text" class="form-control" name="product_type" id="product_type" value="{{product.product_type}}">
+         </div>
 
-   <div class="form-group">
-        <label for="exampleInput1">Barcode of product</label>
-        <input type="text" class="form-control" name="barcode" id="exampleInput1" value={{product.barcode}}>
-    </div>
+         <div class="form-group">
+            <label for="client_role">Client Role</label>
+            <select class="form-control" id="client_role" name="client_role">
+                <option value="Staff/Faculty/Graduate" {% if product.client_role =='Staff/Faculty/Graduate' %} selected {% endif %}>Staff/Faculty/Graduate</option>
+                <option value="Student_Org" {% if product.client_role =='Student_Org' %} selected {% endif %}>Student Org</option>
+            </select>
+         </div>
 
-    <div class="form-group">
-               <label for="exampleInput2">Quantity of product range from</label>
-               <input type="text" class="form-control" name="quantity_from" id="exampleInput2" placeholder={{product.quantity_from}}>
+          <div class="form-group">
+               <label for="description">Description</label>
+               <input type="text" class="form-control" name="description" id="description" value="{{product.description}}">
+           </div>
+
+
+          <div class="form-group">
+               <label for="product_code">Product Code</label>
+               <input type="text" class="form-control" name="product_code" id="product_code" value="{{product.product_code}}">
            </div>
 
           <div class="form-group">
-               <label for="exampleInput21">Quantity of product range to</label>
-               <input type="text" class="form-control" name="quantity_to" id="exampleInput21" placeholder={{product.quantity_to}}>
+               <label for="quantity_range">Quantity Range</label>
+               <input type="text" class="form-control" name="quantity_range" id="quantity_range" value="{{product.quantity_range}}">
            </div>
 
-     <div class="form-group">
-          <label for="exampleInput3">Price of product</label>
-          <input type="text" class="form-control" name="price" id="exampleInput3" value={{product.price}}>
-      </div>
+           <div class="form-group">
+                <label for="price">Price</label>
+                <input type="text" class="form-control" name="price" id="price" value="{{product.price}}">
+            </div>
 <div class="">
   <button type="submit" class="btn btn-success">Update</button>
 </div>

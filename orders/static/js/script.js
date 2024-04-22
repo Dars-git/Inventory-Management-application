@@ -129,11 +129,13 @@ function getProduct(event , row_id) {
            alert("sorry you do not have enough product")
          }else{
            $("#price_"+row_id).val(response.price);
-           $("#name_"+row_id).val(response.name);
+           $("#name_"+row_id).val(response.product_type);
+           $("#quantity_"+row_id).val(response.quantity);
+           $("#quantity_min_"+row_id).val(response.quantity_min);
+           $("#quantity_max_"+row_id).val(response.quantity_max);
            $("#qty_"+row_id).val(1);
            getTotal(row_id);
            totalamount();
-           addrow();
          }
 
       },
@@ -148,6 +150,25 @@ function getProduct(event , row_id) {
 
   }
 }
+
+
+
+function checkQuantityRange(row_id) {
+  var qty = parseInt($("#qty_" + row_id).val());
+  var minQty = parseInt($("#quantity_min_" + row_id).val());
+  var maxQty = parseInt($("#quantity_max_" + row_id).val());
+
+  if (qty < minQty) {
+    $("#qty_" + row_id).val(minQty);
+    alert("Quantity adjusted to minimum allowed quantity: " + minQty);
+  } else if (qty > maxQty) {
+    $("#qty_" + row_id).val(maxQty);
+    alert("Quantity adjusted to maximum allowed quantity: " + maxQty);
+  }
+  getTotal(row_id); // Recalculate total after adjusting quantity
+  totalamount(); // Recalculate total amount after adjusting quantity
+}
+
 
 function totalamount() {
   var total = 0;

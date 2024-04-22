@@ -9,7 +9,7 @@ class getproduct(Resource):
         j={}
         product = Products.query.all()
         for y in product:
-            j[y.name]=y.name
+            j[y.product_type]=y.product_type
         return j
 
 class getamount(Resource):

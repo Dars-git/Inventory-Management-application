@@ -23,28 +23,37 @@
 
 
         <div class="form-group">
-             <label for="exampleInput">Name of product</label>
-             <input type="text" class="form-control" name="name" id="exampleInput" placeholder="Name of product">
+             <label for="product_type">Product Type</label>
+             <input type="text" class="form-control" name="product_type" id="product_type" placeholder="COLOR PRINTING & COPY">
          </div>
 
          <div class="form-group">
-              <label for="exampleInput1">Barcode of product</label>
-              <input type="text" class="form-control" name="barcode" id="exampleInput1" placeholder="Barcode of product">
-          </div>
+            <label for="client_role">Client Role</label>
+            <select class="form-control" id="client_role" name="client_role">
+                <option value="Staff/Faculty/Graduate">Staff/Faculty/Graduate</option>
+                <option value="Student_Org">Student Org</option>
+            </select>
+         </div>
 
           <div class="form-group">
-               <label for="exampleInput2">Quantity of product range from</label>
-               <input type="text" class="form-control" name="quantity_from" id="exampleInput2" placeholder="Quantity of product range from">
+               <label for="description">Description</label>
+               <input type="text" class="form-control" name="description" id="description" placeholder="8.5x11 28/32lb">
+           </div>
+
+
+          <div class="form-group">
+               <label for="product_code">Product Code</label>
+               <input type="text" class="form-control" name="product_code" id="product_code" placeholder="111111">
            </div>
 
           <div class="form-group">
-               <label for="exampleInput21">Quantity of product range to</label>
-               <input type="text" class="form-control" name="quantity_to" id="exampleInput21" placeholder="Quantity of product range to">
+               <label for="quantity_range">Quantity Range</label>
+               <input type="text" class="form-control" name="quantity_range" id="quantity_range" placeholder="1-99">
            </div>
 
            <div class="form-group">
-                <label for="exampleInput3">Price of product</label>
-                <input type="text" class="form-control" name="price" id="exampleInput3" placeholder="Price of product">
+                <label for="price">Price</label>
+                <input type="text" class="form-control" name="price" id="price" placeholder="0.55">
             </div>
 
 
@@ -63,49 +72,61 @@
   <thead>
 
     <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Barcode</th>
-      <th scope="col">Quantity range from </th>
-      <th scope="col">Quantity range to </th>
+      <th scope="col">Product Type</th>
+      <th scope="col">Client Role</th>
+      <th scope="col">Description</th>
+      <th scope="col">Product Code</th>
+      <th scope="col">Quantity Range</th>
       <th scope="col">Price</th>
       <th scope="col">Action</th>
     </tr>
 
   </thead>
-  <tbody>
+ <tbody>
     {% for product in products %}
     <tr>
-      <th>{{product.name}}</th>
-      <td>{{product.barcode}}</td>
-      <td>{{product.quantity_from}}</td>
-      <td>{{product.quantity_to}}</td>
-      <td>{{product.price}}</td>
-      <td> <a href="/product/update/{{product.id}}"><button type="button" class="btn btn-primary btn-circle btn-sm"> <i class="far fa-edit"></i></button></a>
-         <a  data-toggle="modal" data-target="#deleteModal{{product.id}}"><button type="button" class="btn btn-danger btn-circle btn-sm"> <i class="far fa-trash-alt"></i></button></a>
-      </td>
+        <th>{{ product.product_type }}</th>
+        <td>{{ product.client_role }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.product_code }}</td>
+        <td>{{ product.quantity_range }}</td>
+        <td>{{ product.price }}</td>
+        <td>
+            <a href="/product/update/{{ product.product_code }}">
+                <button type="button" class="btn btn-primary btn-circle btn-sm">
+                    <i class="far fa-edit"></i>
+                </button>
+            </a>
+            <a data-toggle="modal" data-target="#deleteModal{{ product.product_code }}">
+                <button type="button" class="btn btn-danger btn-circle btn-sm">
+                    <i class="far fa-trash-alt"></i>
+                </button>
+            </a>
+        </td>
     </tr>
-   <!-- delete model -->
-    <div class="modal fade" id="deleteModal{{product.id}}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="deleteModalLabel">Delete Product?</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <form action="{{ url_for('delete_product', product_id=product.id) }}" method="POST">
-              <input class="btn btn-danger" type="submit" value="Delete">
-            </form>
-          </div>
+    <!-- delete modal -->
+    <div class="modal fade" id="deleteModal{{ product.product_code }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Product?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <form action="{{ url_for('delete_product', product_code=product.product_code) }}" method="POST">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input class="btn btn-danger" type="submit" value="Delete">
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
     {% endfor %}
+</tbody>
 
-  </tbody>
 </table>
 
 {% endblock %}

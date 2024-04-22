@@ -4,7 +4,6 @@
 
 <table class="table table-striped" id="dataTable">
   <thead>
-
     <tr>
       <th scope="col">Bill No.</th>
       <th scope="col">Total Amount</th>
@@ -17,8 +16,8 @@
     {% for order in orders %}
     <tr>
       <th>{{order.id}}</th>
-      <td>{{order.total_amount}}</td>
-      <td>{{order.date_creation}}</td>
+      <td>{{order.total}}</td>
+      <td>{{order.order_date}}</td>
       <td>
          <a href="/printInvoice/{{order.id}}"><button type="button" class="btn btn-success btn-circle btn-sm"><i class="fas fa-print"></i></button></a>
          <a href="/order/update/{{order.id}}"><button type="button" class="btn btn-primary btn-circle btn-sm"> <i class="far fa-edit"></i></button></a>
