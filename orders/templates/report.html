@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        canvas {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sales Report</h1>
+    <canvas id="salesChart"></canvas>
+
+    <h1>Order Summary</h1>
+    <canvas id="orderSummaryChart"></canvas>
+
+    <h1>Product Inventory Report</h1>
+    <canvas id="inventoryChart"></canvas>
+
+    <script>
+        // Sales Report Data
+        var salesLabels = []; // Dates or time periods
+        var salesAmounts = []; // Total sales amounts
+        // Populate salesLabels and salesAmounts with data from your database
+
+        // Order Summary Data
+        var orderStatusLabels = []; // Order status labels
+        var orderStatusCounts = []; // Number of orders for each status
+        // Populate orderStatusLabels and orderStatusCounts with data from your database
+
+        // Product Inventory Report Data
+        var productLabels = []; // Product names or codes
+        var productQuantities = []; // Quantities of each product
+        // Populate productLabels and productQuantities with data from your database
+
+        // Sales Chart
+        var ctxSales = document.getElementById('salesChart').getContext('2d');
+        var salesChart = new Chart(ctxSales, {
+            type: 'bar',
+            data: {
+                labels: salesLabels,
+                datasets: [{
+                    label: 'Total Sales Amount',
+                    data: salesAmounts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        // Order Summary Chart
+        var ctxOrderSummary = document.getElementById('orderSummaryChart').getContext('2d');
+        var orderSummaryChart = new Chart(ctxOrderSummary, {
+            type: 'pie',
+            data: {
+                labels: orderStatusLabels,
+                datasets: [{
+                    label: 'Order Summary',
+                    data: orderStatusCounts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        // Product Inventory Chart
+        var ctxInventory = document.getElementById('inventoryChart').getContext('2d');
+        var inventoryChart = new Chart(ctxInventory, {
+            type: 'horizontalBar',
+            data: {
+                labels: productLabels,
+                datasets: [{
+                    label: 'Product Inventory',
+                    data: productQuantities,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    </script>
+</body>
+</html>

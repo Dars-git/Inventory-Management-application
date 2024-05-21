@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from datetime import datetime
 
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return Users.query.get(int(user_id))
@@ -34,7 +35,8 @@ class Orders_items(db.Model):
     total = db.Column(db.String(80), nullable=False)
     client_name = db.Column(db.String(80), nullable=False)
     client_contact = db.Column(db.String(80), nullable=False)
-    order_date = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    status = db.Column(db.String(80), nullable=False)
+    order_date = db.Column(db.DateTime, nullable=False)
     order_id = db.Column(db.Integer, db.ForeignKey('orders.id'))
 
 class Products(db.Model):
@@ -46,9 +48,14 @@ class Products(db.Model):
     quantity_min = db.Column(db.String(80), nullable=True)
     quantity_max = db.Column(db.String(80), nullable=True)
     price = db.Column(db.String(80), nullable=False)
+    stock = db.Column(db.String(80), nullable=False)
+
+
+
 
 
 # Check if tables exist, if not create them
 with app.app_context():
+
     #db.drop_all()
     db.create_all()

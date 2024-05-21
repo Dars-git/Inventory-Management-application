@@ -7,8 +7,8 @@ from sqlalchemy import func
 from orders.forms import RegisterForm
 from flask_login import login_user, current_user, logout_user, login_required
 from passlib.hash import sha256_crypt
-from datetime import datetime
-
+from datetime import datetime, timedelta
+from flask import session
 
 def getlist():
     user = Users.query.filter_by(email=current_user.email).first()
@@ -19,18 +19,31 @@ def getlist():
 @app.route('/dashboard')
 #@login_required
 def dashboard():
-    order = db.session.query(Orders).filter(func.date(Orders.date_creation) == date.today()).all()
-    count = 0
-    for i in order:
-        count += int(i.total_amount)
-    num_orders = db.session.query(Orders).filter(func.date(Orders.date_creation) == date.today()).count()
+    count = db.session.query(Orders_items).filter(func.date(Orders_items.order_date) == date.today()).count()
 
+    num_orders = db.session.query(Orders_items).count()
+    today = datetime.today()
+    # Calculate the start of the current week (Monday)
+    start_of_this_week = today - timedelta(days=today.weekday())
+    # Calculate the start of the last week (Monday)
+    end_of_this_week = start_of_this_week + timedelta(days=7)
+    print(start_of_this_week)
+    #print(start_of_last_week)
+    print(end_of_this_week)
+    orders = db.session.query(Orders_items).filter(
+        Orders_items.order_date >= start_of_this_week,
+        Orders_items.order_date <= end_of_this_week
+    ).all()
+
+    # Query orders with "pending" status
+    pending_orders = db.session.query(Orders_items).filter(Orders_items.status == "pending").all()
+    #print(orders)
     context = {
         'daily' : count,
-        'orders' : num_orders
+        'numorders' : num_orders
     }
 
-    return render_template('index.html',context=context)
+    return render_template('index.html',context=context, orders=orders, pending_orders=pending_orders)
 
 
 @app.route('/',methods=['POST','GET'])
@@ -48,6 +61,7 @@ def login():
             passwordd=Users.query.filter_by(email=email).first()
             if sha256_crypt.verify(password_candidate, passwordd.password):
                 login_user(user)
+                session['username'] = user.username
                 #flash('You are now logged in', 'success')
                 return redirect(url_for('dashboard'))
 
@@ -107,10 +121,17 @@ def insert():
     qua = request.form.getlist('item_quantity[]')
     name = request.form.getlist('item_name[]')
     total = request.form.getlist('total[]')
+
     price = request.form.getlist('price[]')
 
     # Convert order_date string to datetime object
     order_date = datetime.strptime(order_date, '%Y-%m-%d')
+    order_date = order_date.strftime('%m-%d-%Y')  # Convert to new format
+    order_date = datetime.strptime(order_date, '%m-%d-%Y')  # Convert back to datetime object
+    order_date = order_date.date()
+    print(order_date)
+
+    #print(order_date)
 
 
 
@@ -118,8 +139,9 @@ def insert():
     try:
         # Insert order items into database
         for q, p, t, n, b in zip(qua, price, total, name, barcode):
+            t = round(float(t), 2)
             ord = Orders_items(product_code=b, quantity=q, product_type=n, price=p, total=t,
-                               client_name=client_name, client_contact=client_contact, order_date=order_date)
+                               client_name=client_name, client_contact=client_contact, order_date=order_date, status="pending")
             db.session.add(ord)
         db.session.commit()
         print("1")  # Print "1" if insertion is successful
@@ -149,11 +171,16 @@ def products():
             description = request.form.get('description')
             product_code = request.form.get('product_code')
             quantity_range = request.form.get('quantity_range')
+            stock = request.form.get('stock')
+
+
             if "-" in quantity_range:
                 quantity_min, quantity_max = map(int, quantity_range.split('-'))
             price = request.form.get('price')
-            add = Products(product_type=product_type,client_role=client_role,description=description,product_code=product_code, quantity_range=quantity_range, quantity_min=quantity_min, quantity_max=quantity_max, price=price )
+            add = Products(product_type=product_type,client_role=client_role,description=description,product_code=product_code, quantity_range=quantity_range, quantity_min=quantity_min, quantity_max=quantity_max, price=price, stock=stock)
             db.session.add(add)
+
+
             db.session.commit()
             return redirect(url_for('products'))
         return render_template('product.html',products=products)
@@ -178,6 +205,7 @@ def update_product(product_code):
         product.description = request.form.get('description')
         product.product_code = request.form.get('product_code')
         product.quantity = request.form.get('quantity_range')
+        product.stock = request.form.get('stock')
         product.price = request.form.get('price')
         db.session.commit()
         return redirect(url_for('products'))
@@ -215,13 +243,11 @@ def update_order(order_id):
         quantity = request.form.get('item_quantity')
         product_type = request.form.get('product_type')
         total = request.form.get('total')
+        total = round(float(total), 2)
         price = request.form.get('price')
         client_name = request.form.get('client_name')
         client_contact = request.form.get('client_contact')
-        order_date = request.form.get('order_date')
-        total_amount = request.form.get('total_amount')
-        order_date = datetime.strptime(order_date, '%Y-%m-%d')
-        #deleteorder(order_id)
+        status = request.form.get('status')
 
         existing_order = Orders_items.query.filter_by(id=order_id).first()
 
@@ -234,9 +260,14 @@ def update_order(order_id):
             existing_order.product_type = product_type
             existing_order.client_name = client_name
             existing_order.client_contact = client_contact
-            existing_order.order_date = order_date
+            existing_order.status = status
+            #existing_order.order_date = order_date
+            #order_date = datetime.strptime(order_date, '%m/%d/%Y')
         db.session.commit()
-
+        if status=="completed":
+            product = Products.query.get(product_code)
+            product.stock = str(int(product.stock)- int(quantity))
+            db.session.commit()
         return redirect(url_for('manageorder'))
 
     return render_template('update_order.html',order = order,order_amount=order)
@@ -252,3 +283,37 @@ def printInvoice(order_id):
       #response.headers['Content-Type'] = 'application/pdf'
       #response.headers['Content-Disposition'] = f'attachment; filename = {order_id}.pdf'
       return render_template('print.html',order=order)
+
+
+@app.route('/generate_report', methods=['GET'])
+#@login_required
+def generate_report():
+    # Fetch all orders and their items from the database
+    orders = Orders.query.all()
+
+    # Prepare data for the report
+    report_data = []
+    for order in orders:
+        order_details = {
+            'order_id': order.id,
+            'user_id': order.user_id,
+            'total_amount': order.total_amount,
+            'date_creation': order.date_creation,
+            'items': []
+        }
+        for item in order.orders:
+            order_details['items'].append({
+                'product_code': item.product_code,
+                'quantity': item.quantity,
+                'product_type': item.product_type,
+                'price': item.price,
+                'total': item.total,
+                'client_name': item.client_name,
+                'client_contact': item.client_contact,
+                'status': item.status,
+                'order_date': item.order_date
+            })
+        report_data.append(order_details)
+
+    # Render the report template with the data
+    return render_template('report.html', report_data=report_data)

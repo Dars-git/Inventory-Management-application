@@ -51,6 +51,11 @@
                <input type="text" class="form-control" name="quantity_range" id="quantity_range" placeholder="1-99">
            </div>
 
+          <div class="form-group">
+               <label for="stock">stock</label>
+               <input type="text" class="form-control" name="stock" id="stock" placeholder="1000">
+           </div>
+
            <div class="form-group">
                 <label for="price">Price</label>
                 <input type="text" class="form-control" name="price" id="price" placeholder="0.55">
@@ -77,6 +82,7 @@
       <th scope="col">Description</th>
       <th scope="col">Product Code</th>
       <th scope="col">Quantity Range</th>
+      <th scope="col">Stock</th>
       <th scope="col">Price</th>
       <th scope="col">Action</th>
     </tr>
@@ -90,6 +96,7 @@
         <td>{{ product.description }}</td>
         <td>{{ product.product_code }}</td>
         <td>{{ product.quantity_range }}</td>
+        <td>{{ product.stock }}</td>
         <td>{{ product.price }}</td>
         <td>
             <a href="/product/update/{{ product.product_code }}">

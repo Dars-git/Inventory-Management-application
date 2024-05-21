@@ -8,6 +8,7 @@
       <th scope="col">Bill No.</th>
       <th scope="col">Total Amount</th>
       <th scope="col">Date</th>
+      <th scope="col">Status</th>
       <th scope="col">Action</th>
     </tr>
 
@@ -18,6 +19,7 @@
       <th>{{order.id}}</th>
       <td>{{order.total}}</td>
       <td>{{order.order_date}}</td>
+      <td>{{order.status}}</td>
       <td>
          <a href="/printInvoice/{{order.id}}"><button type="button" class="btn btn-success btn-circle btn-sm"><i class="fas fa-print"></i></button></a>
          <a href="/order/update/{{order.id}}"><button type="button" class="btn btn-primary btn-circle btn-sm"> <i class="far fa-edit"></i></button></a>
